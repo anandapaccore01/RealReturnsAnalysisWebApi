@@ -70,6 +70,7 @@ def residential_analysis(request):
     if request.GET.get("mobileapi"):
         mobile_api = True
     form_data = request.POST.get("form_data")
+    
     if form_data:
         # import urllib.parse
 
@@ -85,6 +86,7 @@ def residential_analysis(request):
     residential_data["dynamic_input_update"] = {}
     post_dict = dict(request.POST)
     print(request.body)
+    print('post',post_dict.get('taxes_increases_type'))
     if request.POST or request.body:
         if mobile_api:
             req_data = json.loads(request.body)
@@ -213,11 +215,11 @@ def residential_analysis(request):
                 annual_rate_interests = float(post_dict.get("annual_rate_interests")[0])
             else:
                 annual_rate_interests = 0
-            if amount_down_payment_type == 0:
+            if amount_down_payment_type == '0':
                 amount_down_payment = balance * 0.01 * amount_down_payment_value
             else:
                 amount_down_payment = int(amount_down_payment_value)
-            if lease_rate_type == 0:
+            if lease_rate_type == '0':
                 gross_income = sft_leased * lease_rate
             else:
                 gross_income = lease_rate * 12
@@ -374,14 +376,16 @@ def residential_analysis(request):
                 annual_rate_interests = float(request.POST.get("annual_rate_interests"))
             else:
                 annual_rate_interests = 0
-            if amount_down_payment_type == 0:
+            if amount_down_payment_type == '0':
                 amount_down_payment = balance * 0.01 * amount_down_payment_value
             else:
                 amount_down_payment = int(amount_down_payment_value)
-            if lease_rate_type == 0:
+            
+            if lease_rate_type == '0':
                 gross_income = sft_leased * lease_rate
             else:
                 gross_income = lease_rate * 12
+            
             if gross_income:
                 residential_data["dynamic_input_update"]["gross_income"] = gross_income
 
@@ -491,7 +495,7 @@ def residential_analysis(request):
 
 def save_residential_reports(request):
     # print(request.POST)
-    user = Users.objects.get(email="prathap.r@paccore.com")
+    user = Users.objects.get(email="ananda.g@paccore.com")
     taxes_increases_type_final = ""
     taxes_increase_value_final = ""
     taxes_increases_for_every_year_final = ""
@@ -924,6 +928,7 @@ def save_residential_reports(request):
         report = Reports.objects.create(
             user_id=user.id,
             asset_name=request.POST.get("asset_name"),
+            asset_address=request.POST.get("asset_address"),
             analysis_type=request.POST.get("analysis_type"),
             acquired_on=request.POST.get("acquired_on"),
             original_purchase_price=int(
@@ -1303,6 +1308,7 @@ def comm_dscr_analysis(request):
     comm_dscr_data["dynamic_input_update"]["cash_flow_after_debt_service"] = getNum(
         cash_flow_after_debt_service
     )
+    print(cash_flow,ADS)
     try:
         debt_service_coverage_ratio = cash_flow / ADS
     except ZeroDivisionError:
@@ -1328,7 +1334,7 @@ def comm_dscr_analysis(request):
 
 def save_comm_dscr_reports(request):
     # print(request.POST)
-    user = Users.objects.get(email="prathap.r@paccore.com")
+    user = Users.objects.get(email="ananda.g@paccore.com")
     try:
         down_payment_percentage = (
             float(getNum(request.POST.get("down_payment")))
@@ -1508,6 +1514,7 @@ def comm_roi_analysis(request):
     if request.POST or request.body:
         if mobile_api:
             req_data = json.loads(request.body)
+            print(req_data)
             post_dict = convert_roi_api_data(req_data)
             x = 0
             expense_vacancy_type = int(post_dict.get("expense_vacancy_type")[0])
@@ -1535,11 +1542,13 @@ def comm_roi_analysis(request):
                 lease_rate = 0
             else:
                 lease_rate = int(lease_rate)
+
             gross_income = post_dict.get("gross_income")[0]
+            
             avg_exp = float(getNum(post_dict.get("avg_exp")[0]))
             # rent_increases = post_dict.get("rent_increases")[0]
             # rent_increase_value = post_dict.get("rent_increase_value")[0]
-
+            
             amount_down_payment_type = int(post_dict.get("amount_down_payment_type")[0])
             if post_dict.get("amount_down_payment_value")[0]:
                 amount_down_payment_value = float(
@@ -1712,13 +1721,15 @@ def comm_roi_analysis(request):
                     + int(closing_expenses)
                 )
                 amount_down_payment = int(amount_down_payment_value)
-            if lease_rate_type == 0:
+            print('ROI',lease_rate_type)
+            if lease_rate_type == '0':
                 gross_income = sft_leased * lease_rate
             else:
                 gross_income = lease_rate * 12
+            print('ROI gross_income',gross_income)
             if gross_income:
                 comm_roi_data["dynamic_input_update"]["gross_income"] = gross_income
-
+            print(gross_income)
             noi = int(gross_income) - int(gross_income) * 0.01
             if noi:
                 comm_roi_data["dynamic_input_update"]["noi"] = noi
@@ -1914,6 +1925,7 @@ def comm_roi_analysis(request):
                 reimbursement_income = float(request.POST.get("reimbursement_income"))
             else:
                 reimbursement_income = 0
+            print('ROI  reimbursement_income', reimbursement_income )
             reim_ye_mo = int(request.POST.get("reim_ye_mo"))
             reim_frequency = int(request.POST.get("reim_frequency"))
             reim_increases_type = int(request.POST.get("reim_increases_type"))
@@ -1945,14 +1957,18 @@ def comm_roi_analysis(request):
                     + int(closing_expenses)
                 )
                 amount_down_payment = int(amount_down_payment_value)
-            if lease_rate_type == 0:
+            print('ROI :',lease_rate)
+            print('ROI1 :',sft_leased)
+            if lease_rate_type == '0':
                 gross_income = sft_leased * lease_rate
             else:
                 gross_income = lease_rate * 12
+            print('ROI Gross:',gross_income)
             if gross_income:
                 comm_roi_data["dynamic_input_update"]["gross_income"] = gross_income
 
-            noi = int(gross_income) - int(gross_income) * 0.01
+            noi = int(gross_income) - int(gross_income) *avg_exp* 0.01
+            print("2",noi)
             if noi:
                 comm_roi_data["dynamic_input_update"]["noi"] = noi
             if balance:
@@ -2081,7 +2097,7 @@ def comm_roi_analysis(request):
 
 def save_comm_roi_reports(request):
     # print(request.POST)
-    user = Users.objects.get(email="prathap.r@paccore.com")
+    user = Users.objects.get(email="ananda.g@paccore.com")
     taxes_increases_type_final = ""
     taxes_increase_value_final = ""
     taxes_increases_for_every_year_final = ""
@@ -3719,6 +3735,7 @@ def save_comm_dscr_reports_api(request):
 def convert_roi_api_data(req_data):
     d = {}
     a = req_data
+    print('12',req_data)
     for k, v in a.items():
         if k == "analysis_type":
             d["analysis_type"] = ast.literal_eval('["' + a[k] + '"]')
@@ -4034,7 +4051,7 @@ def convert_roi_api_data(req_data):
 @csrf_exempt
 def save_comm_roi_reports_api(request):
     # print(request.POST)
-    user = Users.objects.get(email="prathap.r@paccore.com")
+    user = Users.objects.get(email="ananda.g@paccore.com")
     req_data = json.loads(request.body)
     post_dict = convert_roi_api_data(req_data)
     taxes_increases_type_final = ""

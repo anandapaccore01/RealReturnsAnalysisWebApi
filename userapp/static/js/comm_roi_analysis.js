@@ -4,6 +4,7 @@ $(document).ready(function() {
 
 
 function dynamicUpdate(){
+    
     var dynupdate_url = $("#ROI_data").attr("data-dynupdate-url");
     var form = $("#comm-roi-info");
     //getting tenant added numbers
@@ -61,7 +62,7 @@ function dynamicUpdate(){
       var NoiRow = document.getElementById("noirow");
 		  var NoiCells = NoiRow.getElementsByTagName("td");
       if (NoiCells[terms]){
-        var noi_value=NoiCells[terms].innerText;
+        var noi_value=NoiCells[terms].innerText;        
         form.find("#noi_value").remove();
         form.append('<input type="hidden" id="noi_value" name="noi_value" value="'+noi_value+'" /> ');
       }

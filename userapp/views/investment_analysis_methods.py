@@ -107,7 +107,7 @@ def amort(
     result += "<th>Tenant Name</th>"
     for count in range(0, terms):
         result += "<th id='Year'>Year " + str(count + 1) + " Lease</th>"
-
+    
     tenant_list = post_dict.get("tenant_name")
 
     sft_leased_list = post_dict.get("sft_leased")
@@ -123,7 +123,7 @@ def amort(
     rent_increases_for_every_year_list = post_dict.get("rent_increases_for_every_year")
 
     SumofAmountYearWise = []
-
+    print('tenant_list:',tenant_list)
     for i in range(0, len(tenant_list)):
         if lease_rate_type == 0:
             year_lease1 = sft_leased_list[i] * lease_rate_list[i]
@@ -948,10 +948,13 @@ def amort(
     calcTerms = calcTerms_initial
     startCount = 1
     endCount = 12
+    global YearCashFlowFinal
     YearCashFlowFinal = 0
+    
     mortagage_loan4 = mortagage_loan
 
     for count in range(0, terms):
+        
         payz, mortagage_loan5 = amort_calc(
             mortagage_loan5,
             mortagage_interest,
@@ -1194,15 +1197,20 @@ def amort1(
     else:
         sale_proceeds_text_display = "@ $" + str(sales_expense_value)
         sale_proceeds = proj_asset_value - sales_expense_value
-
-    if (
-        post_dict.get("inst_sum_yearcashflow")
-        and post_dict.get("inst_sum_yearcashflow")[0]
-    ):
-        YearCashFlow = float(post_dict.get("inst_sum_yearcashflow")[0])
-    else:
-        YearCashFlow = 0
-
+    
+    
+    # if (
+    #     post_dict.get("inst_sum_yearcashflow")
+    #     and post_dict.get("inst_sum_yearcashflow")[0]
+    # ):
+        
+    #     YearCashFlow = float(post_dict.get("inst_sum_yearcashflow")[0])
+    # else:
+    #     YearCashFlow = 0
+    
+    YearCashFlow = float(YearCashFlowFinal)
+    # global BM_10
+    # BM_10 = float(post_dict.get("inst_sum_BM_10"))
     if post_dict.get("inst_sum_BM_10") and post_dict.get("inst_sum_BM_10")[0]:
         BM_10 = float(post_dict.get("inst_sum_BM_10")[0])
     else:
@@ -1234,6 +1242,7 @@ def amort1(
     ROI_10_display = "$ " + str(round(getNum(ROI_10)))
     Per_profit_display = str(round(getNum(Per_profit), 2)) + " %"
     Cash_on_hand_display = "$ " + str(round(getNum(Cash_on_hand)))
+    
 
     result = '<table border="1" class="table table-sm"  width="800px" id="investment_summary"><tr>  <thead><tr> <th colspan="2">ROI SUMMARY </th></thead>'
     # begin building the return string for the display of the amort table
@@ -2280,6 +2289,7 @@ def comm_amort(
         if count == 0:
             all_income_slab = float(all_income_slab) + float(closing_concession)
         total_year_calc_new = float(all_income_slab) - float(total_year_calc)
+        print('2s', total_year_calc_new)
         if count > 1:
             blurcss = "blurcss"
         else:
@@ -2300,6 +2310,7 @@ def comm_amort(
     result += (
         "</tr><tr id='caprow'><td>CAP Rate  (NOI/Asset Acquisition Value 'AAV')</td>"
     )
+    acq_value_list = []
     if mobile_api:
         mob_investment_analysis["CAP Rate  (NOI/Asset Acquisition Value 'AAV')"] = []
     for count in range(0, terms):
@@ -2417,6 +2428,7 @@ def comm_amort(
             blurcss = "blurcss"
         else:
             blurcss = "Year"
+        acq_value_list.append(acq_value)
         result += (
             "<td id=" + blurcss + ">" + str(round(getNum(acq_value), 2)) + " %</td>"
         )
@@ -2632,7 +2644,14 @@ def comm_amort(
     calcTerms = calcTerms_initial
     startCount = 1
     endCount = 12
+    global YearCashFlowFinal
     YearCashFlowFinal = 0
+    global noi_val
+    noi_val=total_year_calc_new
+    global cap_string, cap_val
+    cap_string = cap_val = acq_value_list[0]
+   
+    
     mortagage_loan4 = mortagage_loan
 
     for count in range(0, terms):
@@ -2770,6 +2789,7 @@ def comm_amort(
             blurcss = "blurcss"
         else:
             blurcss = "Year"
+        print('ROI', yealy_cashflow)
         result += (
             "<td id="
             + blurcss
@@ -2915,6 +2935,7 @@ def comm_amort(
         except ZeroDivisionError:
             ROI = 0
         total_roi += ROI
+        print('3s',ROI)
         if count == 0:
             amort_dynamic_input_update["year1_roi"] = round(ROI, 2)
         if count > 1:
@@ -3099,17 +3120,18 @@ def comm_amort1(
     mobile_api,
 ):
     amort1_dynamic_input_update = {}
+    
     if mobile_api:
         mob_investment_summary = {}
     if asset_appraisal_type == 0:
         appraisal_text_display = "@" + str(asset_appraisal_value) + "%"
         proj_asset_value = (
-            balance + ((balance * asset_appraisal_value) / 100) * no_years
+             ((balance * asset_appraisal_value) / 100) * no_years
         )
     else:
-        appraisal_text_display = "@ $" + asset_appraisal_value
+        appraisal_text_display = "@ $" + str(asset_appraisal_value)
         proj_asset_value = balance + (asset_appraisal_value * no_years)
-
+    
     if sales_expense_type == 0:
         sale_proceeds_text_display = "@" + str(sales_expense_value) + "%"
         sale_proceeds = proj_asset_value - (
@@ -3118,19 +3140,23 @@ def comm_amort1(
     else:
         sale_proceeds_text_display = "@ $" + str(sales_expense_value)
         sale_proceeds = proj_asset_value - sales_expense_value
-
-    if (
-        post_dict.get("inst_sum_yearcashflow")
-        and post_dict.get("inst_sum_yearcashflow")[0]
-    ):
-        YearCashFlow = float(post_dict.get("inst_sum_yearcashflow")[0])
-    else:
-        YearCashFlow = 0
-
+    
+    
+    
+    # if (
+    #     post_dict.get("inst_sum_yearcashflow")
+    #     and post_dict.get("inst_sum_yearcashflow")[0]
+    # ):
+    #     YearCashFlow = float(post_dict.get("inst_sum_yearcashflow")[0])
+    # else:
+    #     YearCashFlow = 0
+    YearCashFlow = float(YearCashFlowFinal)
+   
     if post_dict.get("inst_sum_BM_10") and post_dict.get("inst_sum_BM_10")[0]:
         BM_10 = float(post_dict.get("inst_sum_BM_10")[0])
     else:
         BM_10 = 0
+    
     interestRate = mortagage_interest
     calcTerms = calcTerms_initial
     startCount = 1
@@ -3138,29 +3164,36 @@ def comm_amort1(
     balance = balance - amount_down_payment
     www = amort_calc_balance(balance, interestRate, calcTerms, startCount, endCount)
     profit_sale = sale_proceeds - www
+    
     try:
         PerCashFlow = (YearCashFlow / amount_down_payment) * 100
     except ZeroDivisionError:
         PerCashFlow = 0
     ROI_10 = (YearCashFlow + profit_sale) - amount_down_payment
-    if post_dict.get("noi_value"):
-        noi_string = post_dict.get("noi_value")[0]
-        noi_string = noi_string.replace("$", "")
-        noi_val = float(noi_string.replace(",", ""))
-    else:
-        noi_string = ""
-        noi_val = 0
-    if post_dict.get("cap_value"):
-        cap_string = post_dict.get("cap_value")[0]
-        cap_val = float(cap_string.replace("%", ""))
-    else:
-        cap_string = ""
-        cap_val = 0
+    
+   
+    # if post_dict.get("noi_value"):
+    #     noi_string = post_dict.get("noi_value")[0]
+    #     noi_string = noi_string.replace("$", "")
+    #     noi_val = float(noi_string.replace(",", ""))
+    #     print('1',noi_val)
+    # else:
+    #     noi_string = ""
+    #     noi_val = 0
+    # noi_val=float(noi_val)
+    # if post_dict.get("cap_value"):
+    #     cap_string = post_dict.get("cap_value")[0]
+    #     cap_val = float(cap_string.replace("%", ""))
+    #     print('1',cap_val)
+    # else:
+    #     cap_string = ""
+    #     cap_val = 0
 
     if post_dict.get("capf_value"):
         capf_string = post_dict.get("capf_value")[0]
     else:
         capf_string = ""
+    print('1',cap_val,noi_val)
     try:  # check this condition as it is added by self
         cap = (noi_val / cap_val) * 100
     except ZeroDivisionError:
@@ -3176,6 +3209,7 @@ def comm_amort1(
         sale_proceeds = proj_asset_value_10 - sales_expense_value
     profit_sale = sale_proceeds - www
     total_roi = (YearCashFlow + profit_sale) - amount_down_payment
+    print(total_roi,amount_down_payment)
     try:
         Per_profit = (total_roi / amount_down_payment) * 100
     except ZeroDivisionError:
@@ -3219,7 +3253,7 @@ def comm_amort1(
         Cash_on_hand_display = "$ " + str(round(getNum(Cash_on_hand)))
     else:
         Cash_on_hand_display = ""
-
+    # print(round(getNum(YearCashFlow)))
     result = '<table border="1" class="table table-sm"  width="800px" id="investment_summary"><tr>  <thead><tr> <th colspan="2">ROI SUMMARY </th></thead>'
     result += (
         "<td>Total Cashflow 'CF' for "

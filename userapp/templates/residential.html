@@ -568,7 +568,7 @@
                             class="btn btn-sm btn-success"> +</button></div>
                       </div>
                     </div>
-                    {% if tenants_count and tenants_count > 0%}
+                    {% if tenants_count and tenants_count > 0 %}
                     {%for tenant in tenants%}
                     {% with forloop.counter0 as tt %}
                     <div class="row mt-2" {% if tt == tenants|length|add:"-1" %} id="dynamic_field" {%endif%}>

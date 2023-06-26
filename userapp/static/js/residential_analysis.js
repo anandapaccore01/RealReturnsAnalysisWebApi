@@ -3,6 +3,7 @@ $(document).ready(function() {
 });
 
 function dynamicUpdate(){
+    // alert('hello')
     var dynupdate_url = $("#residential_data").attr("data-dynupdate-url");
     var csrftoken = $("#residential_data").attr("data-csrf");
     var form = $("#residential-info");
@@ -39,17 +40,21 @@ function dynamicUpdate(){
         var additional1 = $(expense_head_name_list[i]).closest('.additional1').attr('id');
         var additional_expenses_num=additional1.match(/(\d+)/);
         additional_expenses_nums.push(additional_expenses_num[0]);
-        console.log(additional_expenses_nums);
+        console.log('hi',additional_expenses_nums);
     }
     form.find("#additional_expenses_nums").remove();
     form.append('<input type="hidden" id="additional_expenses_nums" name="additional_expenses_nums" value="'+additional_expenses_nums+'" /> ');
     var closing_expenses = document.getElementById('closing_expenses_view').innerHTML;
     form.find("#hidden_closing_exp_view").remove();
     form.append('<input type="hidden" id="hidden_closing_exp_view" name="closing_expenses_view" value="'+closing_expenses+'" /> ');
+    console.log('Year--',$('#YearCashFlow'))
     if($('#YearCashFlow').length){
         var YearCashFlow = document.getElementById('YearCashFlow').innerHTML;
+        ;
         form.find("#inst_sum_yearcashflow").remove();
+        
         form.append('<input type="hidden" id="inst_sum_yearcashflow" name="inst_sum_yearcashflow" value="'+YearCashFlow+'" /> ');
+        console.log('yearcashflow',YearCashFlow); 
     }
     if($('#BM_10').length){
         var BM_10 = document.getElementById('BM_10').innerHTML;
@@ -74,8 +79,9 @@ function dynamicUpdate(){
             $("#total_roi_percentage").val(data.dynamic_input_update.total_roi_percentage); 
             $("#total_roi").val(data.dynamic_input_update.total_roi); 
             $("#Result").html(data.invest_analysis_html);
+            $("#Result").show();
             $("#Results").html(data.invest_summary_html);
-            console.log("dynamicUpdate function called") 
+            // console.log("dynamicUpdate function called") 
   }});
 }
 

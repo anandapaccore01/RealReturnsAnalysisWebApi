@@ -260,6 +260,7 @@ class Plans(models.Model):
 class Reports(models.Model):
     user_id = models.IntegerField()
     asset_name = models.CharField(max_length=100)
+    asset_address=models.CharField(max_length=100, blank=True, null=True)
     acquired_on = models.CharField(max_length=10)
     no_years = models.IntegerField()
     total_sft = models.CharField(max_length=20)
